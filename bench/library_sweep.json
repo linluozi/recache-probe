@@ -1,0 +1,37 @@
+{
+  "jinja2.from_string+render x100": {
+    "calls": 10,
+    "compile_seconds": 0.000809,
+    "string_pattern_calls": 10,
+    "unique_patterns": 9,
+    "wall_seconds": 0.0693
+  },
+  "packaging.Version x5x95": {
+    "calls": 0,
+    "compile_seconds": 0.0,
+    "string_pattern_calls": 0,
+    "unique_patterns": 0,
+    "wall_seconds": 0.0029
+  },
+  "requests.Request.prepare x200": {
+    "calls": 0,
+    "compile_seconds": 0.0,
+    "string_pattern_calls": 0,
+    "unique_patterns": 0,
+    "wall_seconds": 0.0092
+  },
+  "rich.Text.from_markup x200": {
+    "calls": 3,
+    "compile_seconds": 0.000286,
+    "string_pattern_calls": 3,
+    "unique_patterns": 3,
+    "wall_seconds": 0.0058
+  },
+  "yaml.safe_dump+safe_load x100": {
+    "calls": 0,
+    "compile_seconds": 0.0,
+    "string_pattern_calls": 0,
+    "unique_patterns": 0,
+    "wall_seconds": 0.0538
+  }
+}

@@ -62,6 +62,21 @@ Two takeaways, both measured rather than assumed:
 
 So the honest conclusion is a **negative result for the common advice**: precompiling regexes in an already-compiled-regex parser is a ~2 % optimization, not a 20 % one. Use this tool to decide whether your call count is in the range where it matters (10^6+), instead of rewriting hot loops on a hunch.
 
+## Generality: the tax is not everywhere
+
+The same probe over representative workloads (`bench/library_sweep.py`, output in `bench/library_sweep.json`):
+
+| workload | `re._compile` calls | share of wall time |
+| --- | --- | --- |
+| `packaging.Version` x5x95 | 0 | 0.00 % |
+| `yaml.safe_dump`+`safe_load` x100 | 0 | 0.00 % |
+| `requests.Request.prepare` x200 | 0 | 0.00 % |
+| `rich.Text.from_markup` x200 | 3 | 0.005 % |
+| `jinja2.from_string`+`render` x100 | 10 | 1.17 % |
+| marko block parse (437 kB) | 27,544 | 4.41 % |
+
+Mature libraries already precompile; marko's block parser is the outlier in this sample. That is the point: the tax is measurable and concentrated, so measure it before rewriting a hot loop.
+
 ## Tests
 
 ```bash
@@ -83,6 +98,8 @@ git clone --depth=1 git@github.com:frostming/marko.git /tmp/marko
 cat /tmp/marko/tests/spec/commonmark.txt /tmp/marko/tests/spec/gfm.txt \
     /tmp/marko/tests/samples/jquery.md /tmp/marko/tests/samples/syntax.md > /tmp/corpus.md
 PYTHONPATH=/tmp/marko:. python bench/marko_case.py /tmp/corpus.md
+# 4. generality sweep
+PYTHONPATH=. python bench/library_sweep.py
 ```
 
 ## Environment
