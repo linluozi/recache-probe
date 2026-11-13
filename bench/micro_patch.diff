@@ -1,7 +1,8 @@
-diff -u -r /tmp/marko_orig/inline_parser.py /tmp/c_marko/marko/inline_parser.py
---- /tmp/marko_orig/inline_parser.py	2026-11-14 02:06:25.255236820 +0800
-+++ /tmp/c_marko/marko/inline_parser.py	2026-11-14 02:06:53.893364250 +0800
-@@ -36,6 +36,9 @@
+diff --git a/marko/inline_parser.py b/marko/inline_parser.py
+index cce87bf..46b4bd0 100644
+--- a/marko/inline_parser.py
++++ b/marko/inline_parser.py
+@@ -36,6 +36,9 @@ ASCII_CONTROL = "".join(chr(i) for i in range(32)) + chr(127)
  MAX_LINK_DEST_PAREN_DEPTH = 32
  # A bracket that is not escaped by a backslash
  _UNESCAPED_BRACKET = re.compile(r"(?<!\\)(?:\\\\)*[\[\]]")
@@ -11,7 +12,7 @@ diff -u -r /tmp/marko_orig/inline_parser.py /tmp/c_marko/marko/inline_parser.py
  
  
  class ParseError(ValueError):
-@@ -228,13 +231,10 @@
+@@ -228,13 +231,10 @@ def find_links_or_emphs(
      :param link_ref_defs: a mapping of link ref definitions.
      :returns: an iterable of match object.
      """
@@ -25,7 +26,7 @@ diff -u -r /tmp/marko_orig/inline_parser.py /tmp/c_marko/marko/inline_parser.py
  
      while i < len(text):
          if escape:
-@@ -243,8 +243,8 @@
+@@ -243,8 +243,8 @@ def find_links_or_emphs(
          elif text[i] == "\\":
              escape = True
              i += 1
@@ -36,7 +37,7 @@ diff -u -r /tmp/marko_orig/inline_parser.py /tmp/c_marko/marko/inline_parser.py
          elif text[i] == "]":
              node = look_for_image_or_link(text, delimiters, i, link_ref_defs, matches)
              if node:
-@@ -253,13 +253,13 @@
+@@ -253,13 +253,13 @@ def find_links_or_emphs(
              else:
                  i += 1
          else:
@@ -52,12 +53,11 @@ diff -u -r /tmp/marko_orig/inline_parser.py /tmp/c_marko/marko/inline_parser.py
                  i = m.start() if m else len(text)
      process_emphasis(text, delimiters, None, matches)
      return matches
-Binary files /tmp/marko_orig/__pycache__/inline_parser.cpython-312.pyc and /tmp/c_marko/marko/__pycache__/inline_parser.cpython-312.pyc differ
-Binary files /tmp/marko_orig/__pycache__/source.cpython-312.pyc and /tmp/c_marko/marko/__pycache__/source.cpython-312.pyc differ
-diff -u -r /tmp/marko_orig/source.py /tmp/c_marko/marko/source.py
---- /tmp/marko_orig/source.py	2026-11-14 02:06:25.256236825 +0800
-+++ /tmp/c_marko/marko/source.py	2026-11-14 02:06:45.468326760 +0800
-@@ -17,6 +17,16 @@
+diff --git a/marko/source.py b/marko/source.py
+index 90b7e7a..e65b45d 100644
+--- a/marko/source.py
++++ b/marko/source.py
+@@ -17,6 +17,16 @@ if TYPE_CHECKING:
  
  
  _LINE_RE = re.compile(r"(?m)[^\n]*$\n?")
@@ -74,7 +74,7 @@ diff -u -r /tmp/marko_orig/source.py /tmp/c_marko/marko/source.py
  _LAZY_LINE_RE = re.compile(r"(?m)[^\n]*?$\n?")
  
  
-@@ -110,9 +120,11 @@
+@@ -110,9 +120,11 @@ class Source:
          return the position of the end of prefix.
          If the prefix is not matched, return -1.
          """

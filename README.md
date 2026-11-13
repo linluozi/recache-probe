@@ -58,7 +58,7 @@ Corpus: marko commit `5611794` test fixtures `tests/spec/commonmark.txt` + `gfm.
 Two takeaways, both measured rather than assumed:
 
 1. The tax is real but bounded: ~294 ns per call at this pattern set. You need roughly **3.4 million** re-entries to pay one second.
-2. The probe's 4.41 % is an **upper bound**: instrumenting every call adds two `perf_counter()` calls. An end-to-end ablation confirms the gap — applying a 90-line micro-patch (`bench/micro_patch.diff`) that caches prefix regexes and hoists three patterns moved the same corpus from **0.2974 s to 0.2907 s (1.02x, 5 runs each)**, not the ~4.4 % the probe alone suggests.
+2. The probe's 4.41 % is an **upper bound**: instrumenting every call adds two `perf_counter()` calls. An end-to-end ablation confirms the gap — applying a 90-line micro-patch (`bench/micro_patch.diff`) that caches prefix regexes and hoists three patterns moved the same corpus in a separate 5-run measurement from **0.2974 s to 0.2907 s (1.02x, 5 runs each)**, not the ~4.4 % the probe alone suggests.
 
 So the honest conclusion is a **negative result for the common advice**: precompiling regexes in an already-compiled-regex parser is a ~2 % optimization, not a 20 % one. Use this tool to decide whether your call count is in the range where it matters (10^6+), instead of rewriting hot loops on a hunch.
 
