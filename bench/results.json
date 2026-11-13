@@ -1,0 +1,57 @@
+{"microbench":
+{
+  "n_per_sample": 200000,
+  "samples_per_impl": 5,
+  "re_match_string_ns": 540.6,
+  "pattern_match_ns": 246.9
+}
+,"marko_case":
+{
+  "corpus_bytes": 437388,
+  "parse_seconds_median": 0.2879,
+  "parse_samples": [
+    0.2973,
+    0.2879,
+    0.2854,
+    0.2889,
+    0.2856
+  ],
+  "compile_calls": 27544,
+  "string_pattern_calls": 27544,
+  "unique_patterns": 54,
+  "compile_seconds": 0.0143,
+  "tax_ratio": 0.0441,
+  "top": [
+    {
+      "pattern": " {,3}(~+|`+)[^\\n\\S]*$",
+      "flags": 8,
+      "calls": 10084,
+      "seconds": 0.00548
+    },
+    {
+      "pattern": " {,3}>",
+      "flags": 0,
+      "calls": 7661,
+      "seconds": 0.00418
+    },
+    {
+      "pattern": " {,3}<",
+      "flags": 0,
+      "calls": 4274,
+      "seconds": 0.00182
+    },
+    {
+      "pattern": " {,3}(=+|-+)[^\\n\\S]*$",
+      "flags": 0,
+      "calls": 2452,
+      "seconds": 0.00108
+    },
+    {
+      "pattern": " {4}",
+      "flags": 0,
+      "calls": 1434,
+      "seconds": 0.00068
+    }
+  ]
+}
+}

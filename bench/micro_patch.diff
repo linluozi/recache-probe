@@ -1,0 +1,90 @@
+diff -u -r /tmp/marko_orig/inline_parser.py /tmp/c_marko/marko/inline_parser.py
+--- /tmp/marko_orig/inline_parser.py	2026-11-14 02:06:25.255236820 +0800
++++ /tmp/c_marko/marko/inline_parser.py	2026-11-14 02:06:53.893364250 +0800
+@@ -36,6 +36,9 @@
+ MAX_LINK_DEST_PAREN_DEPTH = 32
+ # A bracket that is not escaped by a backslash
+ _UNESCAPED_BRACKET = re.compile(r"(?<!\\)(?:\\\\)*[\[\]]")
++_DELIMITERS_RE = re.compile(r"(?:!?\[|\*+|_+)")
++_SPECIAL_RE = re.compile(r"[\\`\]!\[*_]")
++_CODE_SPAN_RE = re.compile(r"(?<!`)(`+)(?!`)([\s\S]+?)(?<!`)\1(?!`)")
+ 
+ 
+ class ParseError(ValueError):
+@@ -228,13 +231,10 @@
+     :param link_ref_defs: a mapping of link ref definitions.
+     :returns: an iterable of match object.
+     """
+-    delimiters_re = re.compile(r"(?:!?\[|\*+|_+)")
+-    special_re = re.compile(r"[\\`\]!\[*_]")
+     i = 0
+     delimiters: list[Delimiter] = []
+     escape = False
+     matches: list[MatchObj] = []
+-    code_pattern = re.compile(r"(?<!`)(`+)(?!`)([\s\S]+?)(?<!`)\1(?!`)")
+ 
+     while i < len(text):
+         if escape:
+@@ -243,8 +243,8 @@
+         elif text[i] == "\\":
+             escape = True
+             i += 1
+-        elif code_pattern.match(text, i):
+-            i = code_pattern.match(text, i).end()  # type: ignore
++        elif m := _CODE_SPAN_RE.match(text, i):
++            i = m.end()
+         elif text[i] == "]":
+             node = look_for_image_or_link(text, delimiters, i, link_ref_defs, matches)
+             if node:
+@@ -253,13 +253,13 @@
+             else:
+                 i += 1
+         else:
+-            m = delimiters_re.match(text, i)
++            m = _DELIMITERS_RE.match(text, i)
+             if m:
+                 delimiters.append(Delimiter(m, text))
+                 i = m.end()
+             else:
+                 # Jump to the next character that can start a token.
+-                m = special_re.search(text, i + 1)
++                m = _SPECIAL_RE.search(text, i + 1)
+                 i = m.start() if m else len(text)
+     process_emphasis(text, delimiters, None, matches)
+     return matches
+Binary files /tmp/marko_orig/__pycache__/inline_parser.cpython-312.pyc and /tmp/c_marko/marko/__pycache__/inline_parser.cpython-312.pyc differ
+Binary files /tmp/marko_orig/__pycache__/source.cpython-312.pyc and /tmp/c_marko/marko/__pycache__/source.cpython-312.pyc differ
+diff -u -r /tmp/marko_orig/source.py /tmp/c_marko/marko/source.py
+--- /tmp/marko_orig/source.py	2026-11-14 02:06:25.256236825 +0800
++++ /tmp/c_marko/marko/source.py	2026-11-14 02:06:45.468326760 +0800
+@@ -17,6 +17,16 @@
+ 
+ 
+ _LINE_RE = re.compile(r"(?m)[^\n]*$\n?")
++_PREFIX_RES: dict[str, Pattern[str]] = {}
++
++
++def _get_prefix_re(prefix: str) -> Pattern[str]:
++    try:
++        return _PREFIX_RES[prefix]
++    except KeyError:
++        compiled = re.compile(prefix)
++        _PREFIX_RES[prefix] = compiled
++        return compiled
+ _LAZY_LINE_RE = re.compile(r"(?m)[^\n]*?$\n?")
+ 
+ 
+@@ -110,9 +120,11 @@
+         return the position of the end of prefix.
+         If the prefix is not matched, return -1.
+         """
+-        m = re.match(prefix, line.expandtabs(4))
++        prefix_re = _get_prefix_re(prefix)
++        expanded = line.expandtabs(4)
++        m = prefix_re.match(expanded)
+         if not m:
+-            if re.match(prefix, line.expandtabs(4).replace("\n", " " * 99 + "\n")):
++            if prefix_re.match(expanded.replace("\n", " " * 99 + "\n")):
+                 return len(line) - 1
+             return -1
+         pos = m.end()
