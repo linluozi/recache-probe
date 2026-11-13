@@ -15,6 +15,7 @@ Upstream: none (original tool).
 ```bash
 python -m venv .venv && . .venv/bin/activate
 pip install -e .
+pip install pytest   # only needed to run the test suite
 # or just run from the checkout:
 PYTHONPATH=. python -m recache_probe --json your_script.py
 ```
