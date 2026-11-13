@@ -78,14 +78,26 @@ The same probe over representative workloads (`bench/library_sweep.py`, output i
 
 Mature libraries already precompile; marko's block parser is the outlier in this sample. That is the point: the tax is measurable and concentrated, so measure it before rewriting a hot loop.
 
+## Find candidates before running
+
+The tax only exists where a module passes a *string* to `re.match`/`search`/`sub`/... instead of a compiled pattern. `scan` finds those call sites without executing anything:
+
+```bash
+PYTHONPATH=. python -m recache_probe scan src/ your_package/
+# your_package/mod.py:42: re.match('[a-z]+')
+# 1 literal-pattern call site(s)
+```
+
+It understands `import re as rx`, `from re import match as m`, skips non-literal patterns, and ignores `re.compile`.
+
 ## Tests
 
 ```bash
 python -m pytest tests -q
-# 9 passed
+# 14 passed
 ```
 
-Tests cover: counting string re-entries, ignoring precompiled `Pattern.match`, per-pattern separation, `re._compile` restoration on normal exit and on exception, finite wall/ratio, report contents, `top()` ordering, and the CLI in a child process.
+Tests cover: counting string re-entries, ignoring precompiled `Pattern.match`, per-pattern separation, `re._compile` restoration on normal exit and on exception, finite wall/ratio, report contents, `top()` ordering, the CLI in a child process, and static scan detection (module alias, `from re import ... as ...`, non-literal skip, `__pycache__` skip, CLI).
 
 ## Reproduce
 
@@ -94,12 +106,14 @@ Tests cover: counting string re-entries, ignoring precompiled `Pattern.match`, p
 python -m pytest tests -q
 # 2. microbenchmark
 python bench/microbench.py
-# 3. marko case study (clone marko at 5611794 first)
+# 3. find literal call sites
+PYTHONPATH=. python -m recache_probe scan .
+# 4. marko case study (clone marko at 5611794 first)
 git clone --depth=1 git@github.com:frostming/marko.git /tmp/marko
 cat /tmp/marko/tests/spec/commonmark.txt /tmp/marko/tests/spec/gfm.txt \
     /tmp/marko/tests/samples/jquery.md /tmp/marko/tests/samples/syntax.md > /tmp/corpus.md
 PYTHONPATH=/tmp/marko:. python bench/marko_case.py /tmp/corpus.md
-# 4. generality sweep
+# 5. generality sweep
 PYTHONPATH=. python bench/library_sweep.py
 ```
 

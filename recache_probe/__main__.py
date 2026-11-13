@@ -7,10 +7,18 @@ import runpy
 import sys
 
 from .probe import Probe, format_report
+from .scan import scan_paths
 
 
 def main(argv: list[str] | None = None) -> int:
     args = list(sys.argv[1:] if argv is None else argv)
+    if args and args[0] == "scan":
+        targets = args[1:] or ["."]
+        sites = scan_paths(targets)
+        for site in sites:
+            print(site)
+        print(f"{len(sites)} literal-pattern call site(s)", file=sys.stderr)
+        return 0
     as_json = False
     if args and args[0] == "--json":
         as_json = True
