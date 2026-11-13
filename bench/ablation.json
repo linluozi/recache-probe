@@ -1,0 +1,27 @@
+{
+  "corpus": "marko tests/spec/commonmark.txt + gfm.txt + samples/*.md",
+  "corpus_bytes": 437388,
+  "design": "5 in-process parses per implementation, new Markdown() each run, same machine/process settings",
+  "baseline": {
+    "samples_s": [
+      0.322461549192667,
+      0.30599980615079403,
+      0.29673363734036684,
+      0.3058830164372921,
+      0.29602746944874525
+    ],
+    "median_s": 0.3058830164372921
+  },
+  "micro_patch": {
+    "samples_s": [
+      0.30439653154462576,
+      0.3029543813318014,
+      0.32536415569484234,
+      0.3030059076845646,
+      0.29785564728081226
+    ],
+    "median_s": 0.3030059076845646
+  },
+  "speedup_median": 1.0095,
+  "patch": "bench/micro_patch.diff"
+}

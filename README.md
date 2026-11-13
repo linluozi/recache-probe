@@ -59,9 +59,9 @@ Corpus: marko commit `5611794` test fixtures `tests/spec/commonmark.txt` + `gfm.
 Two takeaways, both measured rather than assumed:
 
 1. The tax is real but bounded: ~294 ns per call at this pattern set. You need roughly **3.4 million** re-entries to pay one second.
-2. The probe's 4.41 % is an **upper bound**: instrumenting every call adds two `perf_counter()` calls. An end-to-end ablation confirms the gap — applying a 90-line micro-patch (`bench/micro_patch.diff`) that caches prefix regexes and hoists three patterns moved the same corpus in a separate 5-run measurement from **0.2974 s to 0.2907 s (1.02x, 5 runs each)**, not the ~4.4 % the probe alone suggests.
+2. The probe's 4.41 % is an **upper bound**: instrumenting every call adds two `perf_counter()` calls. An end-to-end ablation confirms the gap — applying a 90-line micro-patch (`bench/micro_patch.diff`) that caches prefix regexes and hoists three patterns moved the same corpus from **0.3059 s to 0.3030 s median (1.010x; `bench/ablation.json`, 5 runs per implementation, raw samples included)**. An earlier run of the same pair gave 1.02x; the effect is ~1–2 %, inside run-to-run noise, not the ~4.4 % the probe alone suggests.
 
-So the honest conclusion is a **negative result for the common advice**: precompiling regexes in an already-compiled-regex parser is a ~2 % optimization, not a 20 % one. Use this tool to decide whether your call count is in the range where it matters (10^6+), instead of rewriting hot loops on a hunch.
+So the honest conclusion is a **negative result for the common advice**: precompiling regexes in an already-compiled-regex parser is a ~1–2 % effect, not a 20 % one. Use this tool to decide whether your call count is in the range where it matters (10^6+), instead of rewriting hot loops on a hunch.
 
 ## Generality: the tax is not everywhere
 
@@ -112,7 +112,7 @@ PYTHONPATH=. python bench/library_sweep.py
 
 ## 本轮创新
 
-第一次把 CPython 正则缓存**重复进入**（`re._compile` re-entry）按 pattern 归因并量化，给出可复算的阈值（~0.29 µs/次，10^6 次才值得改），并用 marko 真实语料上的 1.02x 端到端消融**推翻**"预编译正则总能显著提速"的常见假设。与台账里按热点函数/缓存结果做的 lab 不同：这里测的是解释器调用路径本身的开销，结论是负面的、可证伪的。
+第一次把 CPython 正则缓存**重复进入**（`re._compile` re-entry）按 pattern 归因并量化，给出可复算的阈值（~0.29 µs/次，10^6 次才值得改），并用 marko 真实语料上 1.010x（另一次 1.02x）的端到端消融**推翻**"预编译正则总能显著提速"的常见假设。与台账里按热点函数/缓存结果做的 lab 不同：这里测的是解释器调用路径本身的开销，结论是负面的、可证伪的。
 
 ## Limits
 
