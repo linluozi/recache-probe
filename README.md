@@ -71,7 +71,7 @@ The same probe over representative workloads (`bench/library_sweep.py`, output i
 | `packaging.Version` x5x95 | 0 | 0.00 % |
 | `yaml.safe_dump`+`safe_load` x100 | 0 | 0.00 % |
 | `requests.Request.prepare` x200 | 0 | 0.00 % |
-| `rich.Text.from_markup` x200 | 3 | 0.005 % |
+| `rich.Text.from_markup` x200 | 3 | 4.93 % |
 | `jinja2.from_string`+`render` x100 | 10 | 1.17 % |
 | marko block parse (437 kB) | 27,544 | 4.41 % |
 
