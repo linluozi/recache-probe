@@ -109,7 +109,8 @@ python bench/microbench.py
 # 3. find literal call sites
 PYTHONPATH=. python -m recache_probe scan .
 # 4. marko case study (clone marko at 5611794 first)
-git clone --depth=1 git@github.com:frostming/marko.git /tmp/marko
+git clone https://github.com/frostming/marko.git /tmp/marko
+git -C /tmp/marko checkout 5611794
 cat /tmp/marko/tests/spec/commonmark.txt /tmp/marko/tests/spec/gfm.txt \
     /tmp/marko/tests/samples/jquery.md /tmp/marko/tests/samples/syntax.md > /tmp/corpus.md
 PYTHONPATH=/tmp/marko:. python bench/marko_case.py /tmp/corpus.md
